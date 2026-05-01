@@ -1,0 +1,395 @@
+CLICKBAIT MODEL + ARTICLE CHECKS EXPLANATION
+===========================================
+
+PART 1: TRAINING METRICS
+========================
+
+These scores come from training and testing the model on labeled data.
+They do NOT describe one article. They describe how good the model is overall.
+
+1) Accuracy
+-----------
+Meaning:
+How many predictions were correct out of all test examples.
+
+Formula:
+accuracy = correct predictions / total predictions
+
+Example:
+If the test set has 100 headlines and the model gets 87 correct:
+accuracy = 87 / 100 = 0.87 = 87%
+
+Your result:
+accuracy = 0.8693
+This means about 86.93% of test headlines were predicted correctly.
+
+Range:
+- 0.0 = worst
+- 1.0 = perfect
+
+Important:
+Accuracy is useful, but it does not tell the full story if one class is much bigger than the other.
+
+
+2) Precision
+------------
+Meaning:
+When the model says "clickbait", how often is it right?
+
+Example:
+The model predicts 35 headlines as clickbait.
+Out of those 35, only 30 are truly clickbait.
+precision = 30 / 35 = 0.857
+
+So precision answers:
+"When the model raises an alarm, can I trust it?"
+
+
+3) Recall
+---------
+Meaning:
+Out of all real clickbait headlines, how many did the model catch?
+
+Example:
+There are actually 40 clickbait headlines in the test set.
+The model correctly catches 30 of them.
+recall = 30 / 40 = 0.75
+
+So recall answers:
+"Did the model miss many real clickbait headlines?"
+
+
+4) F1 Score
+-----------
+Meaning:
+F1 is a balance between precision and recall.
+
+Why it matters:
+A model is good only if:
+- when it says clickbait, it is often right (precision)
+- it also catches most real clickbait headlines (recall)
+
+If one of them is low, F1 will drop.
+
+So F1 answers:
+"How good is the model at detecting clickbait in a balanced way?"
+
+Your clickbait F1:
+0.8291 = 82.91%
+
+Will F1 always stay the same?
+No.
+It can change if you change:
+- the dataset
+- data cleaning
+- train/test split
+- model settings
+- random seed
+
+If you use the same script, same data, and fixed random_state, the result should usually stay the same or be extremely close.
+
+
+5) ROC-AUC
+----------
+Meaning:
+This measures how good the model's probability scores are.
+
+The model does not only say:
+- clickbait
+- not clickbait
+
+It also gives probabilities, like:
+- 0.95
+- 0.72
+- 0.18
+- 0.03
+
+ROC-AUC checks whether real clickbait headlines usually get higher probabilities than non-clickbait headlines.
+
+Easy way to think about it:
+Pick one real clickbait headline and one real non-clickbait headline.
+ROC-AUC asks:
+"What is the chance the model gives the clickbait headline a higher score?"
+
+Range:
+- 0.5 = random guessing
+- 1.0 = perfect
+
+Your result:
+0.9339
+This is very strong.
+It means the model is good at ranking clickbait above non-clickbait.
+
+
+6) What does 0.xxx mean?
+------------------------
+These are decimal scores.
+
+Examples:
+- 0.50 = 50%
+- 0.70 = 70%
+- 0.8291 = 82.91%
+- 0.9339 = 93.39%
+
+Usually the range is:
+- 0.0 to 1.0
+
+
+7) Your clickbait model results in simple words
+-----------------------------------------------
+accuracy = 0.8693
+The model gets about 87 out of 100 headlines correct overall.
+
+f1 = 0.8291
+The model is doing a good balanced job detecting clickbait.
+
+roc_auc = 0.9339
+The model's probability scores are very strong.
+
+
+PART 2: WHY train_clickbait.py AND train_model.py ARE DIFFERENT
+===============================================================
+
+They train different models for different tasks.
+
+1) train_clickbait.py
+---------------------
+Task:
+Detect whether a headline is clickbait or not.
+
+Classes:
+- 0 = non-clickbait
+- 1 = clickbait
+
+
+2) train_model.py
+-----------------
+Task:
+Detect whether an article looks like:
+- general news
+- fact-check article
+
+Classes:
+- 0 = General News
+- 1 = Fact-Check
+
+Important:
+This is NOT a fake-news truth detector.
+It only classifies article style/type.
+
+
+PART 3: HOW YOUR ARTICLE ANALYSIS SYSTEM WORKS
+==============================================
+
+Your system is not doing true claim-level fact-checking yet.
+It is doing credibility analysis using several signals.
+
+Main checks:
+1. Headline Classification
+2. Headline-Body Match
+3. Domain Reputation
+4. Clickbait Detection
+5. Recency Check
+6. Cross-Source Verification
+
+Think of it like this:
+The system looks at different warning signs and trust signs, then gives an overall credibility estimate.
+
+
+PART 4: HEADLINE-BODY MATCH
+===========================
+
+Goal:
+Check whether the headline matches what the article body is really saying.
+
+The system compares the headline with paragraphs/chunks from the article body.
+
+It uses 2 types of similarity:
+
+1) Lex = lexical similarity
+Meaning:
+Do the headline and paragraph share similar words?
+
+Example:
+Headline: "Oil rally sends Japanese stocks down"
+Body: "Japanese shares fell as oil prices surged"
+The words are somewhat similar.
+This gives lexical similarity.
+
+2) Sem = semantic similarity
+Meaning:
+Do the headline and paragraph mean similar things, even if the words are different?
+
+Example:
+Headline: "Stocks slide after oil jump"
+Body: "Equity markets declined as crude prices rose"
+Words are different, but meaning is close.
+This gives semantic similarity.
+
+The final match score combines both:
+- Lexical weight = 35%
+- Semantic weight = 65%
+
+So semantic meaning matters more than exact words.
+
+Example:
+If Lex = 30% and Sem = 60%
+Final combined similarity is about 49.5%
+
+What does avg similarity mean?
+The system finds the best matching body chunks, takes the top few, and averages them.
+
+Typical interpretation:
+- high = headline and body match well
+- low = headline may exaggerate or misrepresent the article
+
+Important:
+This score does NOT mean factual truth.
+It only means headline-to-body consistency.
+
+
+PART 5: CLICKBAIT DETECTION
+===========================
+
+Goal:
+Estimate whether the headline uses clickbait style.
+
+Your system uses 2 parts:
+
+1) Rule-based signals
+It looks for things like:
+- "you won't believe"
+- "what happened next"
+- "one weird trick"
+- emotional words
+- vague words
+- too many exclamation/question marks
+- ALL CAPS words
+
+2) ML model
+If clickbait_model.pkl exists, the system also asks the trained model for a clickbait probability.
+
+Mode meanings:
+- rule_only = only rules were used
+- hybrid = both rules and ML model were used
+
+What does:
+"Clickbait: 6% • Neutral: 94% • Mode: hybrid"
+mean?
+
+It means:
+- final clickbait probability = 6%
+- non-clickbait / neutral probability = 94%
+- both rules and ML model were used
+
+This is not truth detection.
+It only estimates how clickbait-like the headline style is.
+
+
+PART 6: RECENCY CHECK
+=====================
+
+Goal:
+Check whether the article is recent enough for its topic.
+
+The system calculates article age from the publish date.
+
+It then puts the article into a bucket:
+- fresh = 0 to 7 days old
+- recent = 8 to 30 days old
+- moderately old = 31 to 180 days old
+- outdated = more than 180 days old
+
+What does Bucket mean?
+It is just the age group.
+
+The system also checks topic sensitivity.
+
+Examples:
+High sensitivity topics:
+- breaking news
+- markets
+- stocks
+- inflation
+- elections
+
+These must be newer to be considered reliable.
+
+Low sensitivity topics:
+- history
+- biography
+- evergreen educational content
+
+These can still be useful even if they are older.
+
+
+PART 7: CROSS-SOURCE VERIFICATION
+=================================
+
+Goal:
+Check whether other sources are reporting similar news.
+
+The system searches for similar headlines from other publishers and compares them.
+
+What does confirmation mean?
+It describes how much support the system found from other sources.
+
+Typical meaning:
+- strong = many strong matching reports were found
+- moderate = some decent support was found
+- weak = only limited support was found
+
+What does mode mean here?
+It tells you how headline similarity was calculated.
+
+Possible meanings:
+- semantic = meaning-based similarity was used
+- tfidf_only = word-overlap similarity only
+- fallback = semantic failed, so it used a simpler method
+
+Important:
+Cross-source verification is not proof that a story is true.
+It only means whether other reporting appears to support it.
+
+
+PART 8: DOMAIN REPUTATION
+=========================
+
+Goal:
+Estimate how trustworthy the website domain looks based on reputation signals.
+
+Example result:
+"Domain japantimes.co.jp: neutral (score 43/100)"
+
+Meaning:
+The system found some trust signals, but not enough to confidently call it highly trusted.
+It also did not find enough negative signs to call it suspicious.
+
+So "neutral" means:
+The system is unsure / moderate confidence.
+
+Important:
+This score depends on the reputation data files your system has available.
+If some data sources are missing, a good website can still get only a neutral score.
+
+
+PART 9: SIMPLE SUMMARY
+======================
+
+Training metrics:
+- Accuracy = overall correctness
+- Precision = when the model says clickbait, how often it is right
+- Recall = how many real clickbait headlines it catches
+- F1 = balance of precision and recall
+- ROC-AUC = how good the probability ranking is
+
+Article checks:
+- Headline-Body Match = does headline match body?
+- Clickbait Detection = does headline look sensational/manipulative?
+- Recency Check = is the article fresh enough for the topic?
+- Cross-Source Verification = do other sources report similar news?
+- Domain Reputation = does the site look reputable?
+
+Most important warning:
+Your current system estimates credibility.
+It does NOT yet prove whether a claim is truly factual or false.

@@ -1,0 +1,28 @@
+# Environment files
+.env
+backend/.env
+
+# Dependencies
+node_modules/
+venv/
+backend/venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Datasets and Models (Recommended to ignore if large)
+backend/*.csv
+backend/*.pkl
+backend/*.xlsx
+backend/*.json
+
+# User requested (be careful: usually public)
+# requirements.txt
+# backend/requirements.txt
+
+# Misc
+.DS_Store
+.vscode/

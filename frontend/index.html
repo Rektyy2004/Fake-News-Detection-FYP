@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fake News Checkmate — News Credibility Analyzer</title>
+  <meta name="description"
+    content="Analyze news articles for credibility using AI-powered patterns, source reputation, and cross-source verification." />
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: "#138aec",
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+  <!-- Top Bar -->
+  <header
+    class="sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
+    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
+          <span class="material-symbols-outlined text-primary">verified</span>
+        </div>
+        <div>
+          <h1 class="text-lg font-extrabold leading-tight">Fake News Checkmate</h1>
+          <p class="text-xs text-gray-500 dark:text-gray-400">Credibility analysis based on text patterns</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="historyBtn"
+          class="h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[20px]">history</span>
+          <span class="text-sm font-semibold">History</span>
+        </button>
+        <button id="themeToggle"
+          class="h-10 w-10 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]">dark_mode</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="mx-auto max-w-6xl px-4 py-6">
+    <div class="grid grid-cols-1 gap-6">
+
+      <!-- Analyzer -->
+      <section
+        class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
+        <div class="p-5 border-b border-gray-200 dark:border-gray-800">
+          <h2 class="text-base font-bold">Analyze an article</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Enter a website URL to analyze its content for credibility and receive an overall score.
+          </p>
+
+          <div class="mt-4 flex flex-col sm:flex-row gap-3">
+            <input id="urlInput" type="text" placeholder="https://example.com/news/article"
+              class="flex-1 h-11 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3 text-sm outline-none focus:ring-2 focus:ring-primary/40" />
+
+            <!-- Analyze button stays visible, shows spinner while loading -->
+            <button id="analyzeBtn"
+              class="h-11 px-5 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 active:scale-[0.99] transition inline-flex items-center justify-center gap-2">
+              <span id="analyzeBtnText">Analyze</span>
+              <span id="analyzeBtnSpinner" class="spinner hidden" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <!-- Status + animated loading bar -->
+          <div id="statusMsg" aria-live="polite" class="mt-3 text-sm text-gray-500 dark:text-gray-400"></div>
+          <div id="loadingBar" class="loading-bar-outer hidden" aria-hidden="true">
+            <div id="loadingBarInner" class="loading-bar-inner indeterminate"></div>
+          </div>
+        </div>
+
+        <div class="p-5">
+          <div id="resultBox" class="space-y-4">
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+              Results will appear here.
+            </div>
+          </div>
+
+          <div class="mt-6 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+            This tool estimates credibility from text patterns, source reputation, and cross-checks. It does not
+            guarantee factual accuracy.
+          </div>
+        </div>
+      </section>
+
+      <!-- History Sidebar -->
+      <aside id="historySidebar"
+        class="fixed inset-y-0 right-0 w-[360px] max-w-[90vw] bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 shadow-2xl z-50 translate-x-full transition-transform">
+        <div class="h-full flex flex-col">
+          <div class="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+            <div>
+              <div class="text-sm font-bold">Analysis History</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">Latest 20 items</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="clearHistoryBtn"
+                class="h-9 px-3 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-950 text-xs font-semibold">
+                Clear
+              </button>
+              <button id="closeSidebarBtn"
+                class="h-9 w-9 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-950 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+              </button>
+
+            </div>
+          </div>
+
+          <div class="p-4 overflow-y-auto flex-1">
+            <div id="historyList" class="space-y-3">
+              <div class="text-sm text-gray-500 dark:text-gray-400">
+                No analysis history yet.
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Sidebar Backdrop (mobile) -->
+      <div id="sidebarBackdrop" class="fixed inset-0 bg-black/40 z-40 hidden lg:hidden"></div>
+    </div>
+  </main>
+
+  <!-- History Snapshot Modal -->
+  <div id="historyModal" class="fixed inset-0 z-[60] hidden">
+    <div id="historyModalOverlay" class="absolute inset-0 bg-black/60"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div
+        class="w-full max-w-2xl rounded-2xl bg-white dark:bg-gray-900 shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div class="min-w-0">
+            <div id="historyModalTitle" class="text-base font-bold text-gray-900 dark:text-white truncate">History</div>
+            <div id="historyModalMeta" class="text-xs text-gray-500 dark:text-gray-400 truncate"></div>
+          </div>
+          <button id="historyModalCloseBtn"
+            class="h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40 p-3">
+            <img id="historyModalImg" alt="Snapshot" class="w-full rounded-lg object-contain max-h-[55vh]" />
+            <div id="historyModalImgFallback" class="hidden text-sm text-gray-600 dark:text-gray-300 py-10 text-center">
+              No snapshot available for this item yet.
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
+            <a id="historyModalOpenLink" target="_blank" rel="noopener"
+              class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium">
+              Open article
+            </a>
+            <button id="historyModalRestoreBtn"
+              class="inline-flex items-center justify-center h-10 px-4 rounded-lg bg-primary hover:bg-primary/90 text-white text-sm font-semibold">
+              Restore result
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
+    Fake News Checkmate • NG YUAN XIN @2026
+  </footer>
+
+  <!-- html2canvas (for snapshot capture) -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script src="scripts.js"></script>
+</body>
+
+</html>

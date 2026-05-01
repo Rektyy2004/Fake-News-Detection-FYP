@@ -1,0 +1,44 @@
+# Core FastAPI dependencies
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+python-multipart==0.0.6
+python-dotenv==1.0.0
+
+# Article extraction
+trafilatura==1.6.3
+tldextract==5.1.1
+
+# NLP and ML
+scikit-learn==1.4.0
+sentence-transformers==2.3.1
+torch==2.1.2
+numpy==1.26.3
+pandas==2.1.4
+
+# Date parsing
+python-dateutil==2.8.2
+
+# HTTP requests
+requests==2.31.0
+
+# Excel file support (for SCImago)
+openpyxl==3.1.2
+
+# Model persistence
+joblib==1.3.2
+
+# WHOIS domain age (used by checks.py)
+python-whois==0.8.0
+
+#Check
+# dir /s /b /a | findstr /v "\\venv\\" | findstr /v "\\node_modules\\"
+
+
+
+# Backend 
+# cd backend
+# .\venv\Scripts\activate
+# python train_clickbait.py
+# python train_model.py
+# python -m uvicorn main:app --reload
