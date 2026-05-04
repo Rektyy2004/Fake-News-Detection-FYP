@@ -1,20 +1,9 @@
 from __future__ import annotations
-
 import numpy as np
-
 from . import ArticlePayload, CheckResult
 from .loaders import load_headline_classifier_model
 
-
 class headline_classifier_check:
-    """
-    Classify whether the article headline looks like:
-    - general news
-    - fact-check article
-
-    This is informational only.
-    """
-
     @staticmethod
     def run(payload: ArticlePayload) -> CheckResult:
         title = (payload.title or "").strip()

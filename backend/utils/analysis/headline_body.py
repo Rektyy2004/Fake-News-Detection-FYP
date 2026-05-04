@@ -1,26 +1,16 @@
 from __future__ import annotations
-
 import re
-from typing import Any, Dict, List
 
+from typing import Any, Dict, List
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
 from . import ArticlePayload, CheckResult
 from .helpers import clamp_pct
 from .loaders import get_sentence_cosine_function, get_sentence_model
 
 
 class headline_body_check:
-    """
-    Check whether the headline matches the article body.
-
-    Uses:
-    - TF-IDF similarity
-    - SentenceTransformer semantic similarity if available
-    """
-
     MIN_PARAGRAPH_WORDS = 50
     TOP_K = 3
     BOTTOM_K = 3
@@ -85,10 +75,6 @@ class headline_body_check:
 
     @staticmethod
     def _chunk_text_if_needed(text: str) -> List[str]:
-        """
-        If text extraction gave one giant paragraph,
-        split it into chunks so we still can compare sections.
-        """
         clean_text = re.sub(r"\s+", " ", text).strip()
         words = clean_text.split()
 

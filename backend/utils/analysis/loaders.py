@@ -19,14 +19,12 @@ except Exception:
     SentenceTransformer = None  # type: ignore
     pytorch_cos_sim = None  # type: ignore
 
-
 def get_backend_dir() -> Path:
     """
     Returns the backend folder.
     Assumes this file is in backend/utils/analysis/loaders.py
     """
     return Path(__file__).resolve().parents[2]
-
 
 def find_backend_file(*names: str) -> Optional[Path]:
     """
@@ -41,7 +39,6 @@ def find_backend_file(*names: str) -> Optional[Path]:
 
     return None
 
-
 def file_mtime_iso(path: Optional[Path]) -> Optional[str]:
     """
     Return file modified time in ISO format.
@@ -53,7 +50,6 @@ def file_mtime_iso(path: Optional[Path]) -> Optional[str]:
         return datetime.utcfromtimestamp(path.stat().st_mtime).isoformat() + "Z"
     except Exception:
         return None
-
 
 @lru_cache(maxsize=1)
 def get_sentence_model() -> Optional["SentenceTransformer"]:
@@ -69,14 +65,12 @@ def get_sentence_model() -> Optional["SentenceTransformer"]:
     except Exception:
         return None
 
-
 @lru_cache(maxsize=1)
 def get_sentence_cosine_function():
     """
     Return pytorch_cos_sim if available.
     """
     return pytorch_cos_sim
-
 
 @lru_cache(maxsize=1)
 def load_headline_classifier_model():
@@ -91,7 +85,6 @@ def load_headline_classifier_model():
         )
 
     return joblib.load(model_path)
-
 
 @lru_cache(maxsize=1)
 def load_clickbait_model():
@@ -112,7 +105,6 @@ def load_clickbait_model():
                 return None
 
     return None
-
 
 @lru_cache(maxsize=1)
 def load_scimagomedia_index() -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Any]]:
@@ -204,7 +196,6 @@ def load_scimagomedia_index() -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Any]
 
     return index, meta
 
-
 @lru_cache(maxsize=1)
 def load_tranco_index() -> Tuple[Dict[str, int], Dict[str, Any]]:
     """
@@ -243,7 +234,6 @@ def load_tranco_index() -> Tuple[Dict[str, int], Dict[str, Any]]:
     }
 
     return index, meta
-
 
 @lru_cache(maxsize=1)
 def load_majestic_index() -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Any]]:

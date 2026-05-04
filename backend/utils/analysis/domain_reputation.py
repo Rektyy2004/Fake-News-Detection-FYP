@@ -12,22 +12,12 @@ from .loaders import (
 )
 
 try:
-    import whois  # type: ignore
+    import whois
 except Exception:
     whois = None
 
 
 class domain_reputation_check:
-    """
-    Score a domain using:
-    - trusted allowlist
-    - SCImago
-    - Tranco
-    - Majestic
-    - WHOIS age
-    - simple suspicious heuristics
-    """
-
     TRUSTED_PUBLISHERS = {
         "bbc.com": 95,
         "bbc.co.uk": 95,

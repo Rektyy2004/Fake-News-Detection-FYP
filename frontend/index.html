@@ -8,7 +8,6 @@
   <meta name="description"
     content="Analyze news articles for credibility using AI-powered patterns, source reputation, and cross-source verification." />
 
-  <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <script>
@@ -77,7 +76,7 @@
             <input id="urlInput" type="text" placeholder="https://example.com/news/article"
               class="flex-1 h-11 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3 text-sm outline-none focus:ring-2 focus:ring-primary/40" />
 
-            <!-- Analyze button stays visible, shows spinner while loading -->
+            <!-- Analyze button-->
             <button id="analyzeBtn"
               class="h-11 px-5 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 active:scale-[0.99] transition inline-flex items-center justify-center gap-2">
               <span id="analyzeBtnText">Analyze</span>
@@ -85,7 +84,7 @@
             </button>
           </div>
 
-          <!-- Status + animated loading bar -->
+          <!-- Status -->
           <div id="statusMsg" aria-live="polite" class="mt-3 text-sm text-gray-500 dark:text-gray-400"></div>
           <div id="loadingBar" class="loading-bar-outer hidden" aria-hidden="true">
             <div id="loadingBarInner" class="loading-bar-inner indeterminate"></div>
@@ -106,7 +105,7 @@
         </div>
       </section>
 
-      <!-- History Sidebar -->
+      <!-- History -->
       <aside id="historySidebar"
         class="fixed inset-y-0 right-0 w-[360px] max-w-[90vw] bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 shadow-2xl z-50 translate-x-full transition-transform">
         <div class="h-full flex flex-col">
@@ -188,7 +187,7 @@
     Fake News Checkmate • NG YUAN XIN @2026
   </footer>
 
-  <!-- html2canvas (for snapshot capture) -->
+  <!-- html2canvas for snapshot capture -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script src="scripts.js"></script>

@@ -1,4 +1,3 @@
-#Tiny reusable functions
 from __future__ import annotations
 
 import math
@@ -9,11 +8,8 @@ from urllib.parse import urlparse
 # For domains like bbc.co.uk or elpais.com.uy
 COMMON_SECOND_LEVEL_DOMAINS = {"co", "com", "org", "net", "gov", "edu"}
 
-
 def clamp01(value: Any) -> float:
-    """
-    Force a value into the range 0.0 to 1.0.
-    """
+
     try:
         number = float(value)
     except Exception:
@@ -21,11 +17,7 @@ def clamp01(value: Any) -> float:
 
     return max(0.0, min(1.0, number))
 
-
 def clamp_pct(value: Any) -> float:
-    """
-    Force a value into the range 0 to 100.
-    """
     try:
         number = float(value)
     except Exception:
@@ -35,12 +27,6 @@ def clamp_pct(value: Any) -> float:
 
 
 def phrase_present(text_lower: str, phrase_lower: str) -> bool:
-    """
-    Safer phrase matching.
-
-    If the phrase has spaces, use simple substring match.
-    If it is one word, use word boundaries.
-    """
     if not text_lower or not phrase_lower:
         return False
 
@@ -52,14 +38,7 @@ def phrase_present(text_lower: str, phrase_lower: str) -> bool:
 
 
 def normalize_domain(raw: Any) -> str:
-    """
-    Convert URL/domain-like input into a clean base domain.
-
-    Examples:
-    - https://www.bbc.co.uk/news -> bbc.co.uk
-    - edition.cnn.com -> cnn.com
-    - example.com/path -> example.com
-    """
+    # Convert URL/domain-like input into a clean base domain.
     if raw is None:
         return ""
 
@@ -81,9 +60,7 @@ def normalize_domain(raw: Any) -> str:
 
     # Remove path
     host = host.split("/")[0].strip().lower()
-    # Remove port
     host = host.split(":")[0].strip().lower()
-    # Remove extra dots
     host = host.strip(".")
 
     if host.startswith("www."):
@@ -94,7 +71,6 @@ def normalize_domain(raw: Any) -> str:
     if len(parts) <= 2:
         return ".".join(parts)
 
-    # Support domains like bbc.co.uk
     tld = parts[-1]
     second_level = parts[-2]
 

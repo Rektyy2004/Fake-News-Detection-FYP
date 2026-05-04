@@ -13,7 +13,6 @@ from pydantic import BaseModel
 from utils.extractors import extract_article, domain_of, is_blocked_domain
 from utils.analysis import analyze_credibility
 
-
 class AnalysisRecord(BaseModel):
     id: str
     url: str
@@ -27,7 +26,6 @@ class AnalysisRecord(BaseModel):
 
 url_history: List[AnalysisRecord] = []
 MAX_HISTORY_SIZE = 100
-
 
 def to_jsonable(x):
     if isinstance(x, dict):
@@ -70,7 +68,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.get("/health")
 async def health():
@@ -158,7 +155,6 @@ async def analyze(url: str):
 
     return JSONResponse(content=to_jsonable(response))
 
-
 @app.get("/history")
 async def get_history(limit: int = 20):
     limit = min(limit, MAX_HISTORY_SIZE)
@@ -170,14 +166,12 @@ async def get_history(limit: int = 20):
         }
     )
 
-
 @app.get("/history/{record_id}")
 async def get_history_item(record_id: str):
     for record in url_history:
         if record.id == record_id:
             return JSONResponse(content=record.dict())
     raise HTTPException(status_code=404, detail="History record not found")
-
 
 @app.delete("/history")
 async def clear_history():

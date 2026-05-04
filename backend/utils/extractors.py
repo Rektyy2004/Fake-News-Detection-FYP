@@ -1,32 +1,3 @@
-"""
-Purpose:
-- Takes a URL and tries to extract a clean news article (title, main text, and publish date).
-- Prepares the article content so the credibility checks can analyze it reliably.
-
-What it does (simple flow):
-1) Safety checks (SSRF protection):
-   - Blocks dangerous URLs like localhost / private IPs to prevent attacks.
-   - Allows only normal web URLs (http/https).
-
-2) Filters out unwanted sources:
-   - Blocks non-news platforms (e.g., social media, search pages, or common non-article domains).
-   - Uses patterns to reject domains that are not meant to be analyzed.
-
-3) Checks if the URL looks like an article:
-   - Rejects “homepage-like” URLs and prefers URLs with article-style paths.
-
-4) Downloads the webpage HTML:
-   - Fetches the page content from the internet.
-
-5) Extracts the real article content:
-   - Uses an article-extraction library (e.g., trafilatura) to remove ads/navbars and keep only the main story.
-   - Returns structured data: {"title": ..., "text": ..., "date": ...}
-
-Why it’s helpful:
-- Websites have lots of clutter (menus, ads, sidebars). This file turns messy HTML into clean article text,
-  making the credibility checks much more accurate and consistent.
-"""
-
 import json
 import re
 from urllib.parse import urlparse
@@ -36,9 +7,7 @@ import tldextract
 import trafilatura
 
 
-# ============================================================================
-# SSRF Protection
-# ============================================================================
+# SSRF (Server Side Request Forgery) Protection
 PRIVATE_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
 PRIVATE_PREFIXES = (
     "10.", "192.168.",
@@ -66,11 +35,9 @@ def block_ssrf(url: str) -> None:
         raise ValueError("Blocked private IP range")
 
 
-# ============================================================================
 # Blocked Domains (Non-News Sites)
-# ============================================================================
 BLOCKED_DOMAINS = {
-    # Social Media Platforms
+    # Social Media
     "facebook.com", "fb.com", "twitter.com", "x.com", "instagram.com",
     "linkedin.com", "tiktok.com", "snapchat.com", "reddit.com",
     "pinterest.com", "tumblr.com", "whatsapp.com", "telegram.org",
@@ -87,15 +54,15 @@ BLOCKED_DOMAINS = {
     # Email Services
     "gmail.com", "outlook.com", "hotmail.com", "protonmail.com", "mail.com",
 
-    # Citation/Academic Tools
+    # Citation Tools
     "mybib.com", "easybib.com", "citethisforme.com", "zbib.org",
     "citationmachine.net",
 
-    # Document/Collaboration Tools
+    # Document Tools
     "docs.google.com", "drive.google.com", "dropbox.com", "onedrive.live.com",
     "notion.so", "evernote.com", "trello.com", "asana.com",
 
-    # Video/Streaming Platforms
+    # Video Platforms
     "youtube.com", "youtu.be", "vimeo.com", "twitch.tv", "dailymotion.com",
     "netflix.com", "hulu.com", "disneyplus.com",
 
@@ -106,10 +73,10 @@ BLOCKED_DOMAINS = {
     "spotify.com", "soundcloud.com", "imdb.com", "rottentomatoes.com",
     "metacritic.com", "steam.com",
 
-    # Blogging Platforms (user-generated, not news)
+    # Blogging Platforms
     "medium.com", "blogger.com", "wordpress.com", "wix.com", "squarespace.com",
 
-    # General Tech/Service Sites
+    # General Tech Sites
     "github.com", "stackoverflow.com", "wikipedia.org", "quora.com",
     "canvas.com", "canvas.instructure.com",
 }
@@ -139,17 +106,13 @@ def is_blocked_domain(domain: str) -> bool:
     return False
 
 
-# ============================================================================
 # Domain Extraction
-# ============================================================================
 def domain_of(url: str) -> str:
     ext = tldextract.extract(url)
     return f"{ext.domain}.{ext.suffix}" if ext.suffix else ext.domain
 
 
-# ============================================================================
 # Article URL Heuristics + HTML Structure Validation
-# ============================================================================
 ARTICLE_PATH_HINTS = (
     "news", "politics", "world", "business", "economy", "markets",
     "tech", "science", "health", "sport", "sports", "opinion",
@@ -163,7 +126,7 @@ def looks_like_article_url(url: str) -> bool:
     if not path or path == "/":
         return False
 
-    # PDFs aren’t supported by this extractor
+    # PDFs not supported by this extractor
     if path.endswith(".pdf"):
         return False
 
@@ -183,9 +146,8 @@ def looks_like_article_url(url: str) -> bool:
     if re.search(r"\b(20\d{2})[/-](\d{1,2})[/-](\d{1,2})\b", path):
         return True
 
-    # Common news section words (only if not a section homepage)
+    # Common news section words
     if any(h in path for h in ARTICLE_PATH_HINTS):
-        # If it's just "/news" or "/politics/", it's likely a section front
         if len(segs) == 1 and segs[0] in ARTICLE_PATH_HINTS:
             return False
         return True
@@ -194,12 +156,7 @@ def looks_like_article_url(url: str) -> bool:
 
 
 def basic_article_html_check(html: str) -> bool:
-    """
-    Quick validation: page should look like an article:
-    - has <h1>
-    - has multiple <p>
-    - ideally has <article> (but not required)
-    """
+    # Quick validation: <h>, <p>:
     if not html:
         return False
 
@@ -207,23 +164,12 @@ def basic_article_html_check(html: str) -> bool:
     p_count = len(re.findall(r"<p[\s>]", html, flags=re.IGNORECASE))
     article_ok = re.search(r"<article[\s>]", html, flags=re.IGNORECASE) is not None
 
-    # strict enough to block non-articles, flexible enough for many news sites
+    # block non-articles
     return h1_ok and p_count >= 3 and (article_ok or p_count >= 7)
 
 
-# ============================================================================
 # Article Extraction
-# ============================================================================
 def extract_article(url: str) -> Optional[Dict[str, str]]:
-    """
-    Fetch and extract article content using trafilatura.
-
-    Returns:
-        Dict with keys: title, text, date (ISO string or None)
-        None if extraction fails
-    Raises:
-        ValueError for invalid / blocked / non-article URLs
-    """
     # SSRF protection
     block_ssrf(url)
 

@@ -28,7 +28,6 @@ const historyModalRestoreBtn = document.getElementById("historyModalRestoreBtn")
 
 const API_BASE = "http://127.0.0.1:8000";
 
-// ============================================================================
 // Theme Mode
 const THEME_KEY = "fnc_theme";
 const themeToggle = document.getElementById("themeToggle");
@@ -54,7 +53,6 @@ themeToggle.addEventListener("click", () => {
 
 initTheme();
 
-// ============================================================================
 // Helpers
 const getTimeAgo = (date) => {
   const seconds = Math.floor((new Date() - date) / 1000);
@@ -492,7 +490,7 @@ async function analyzeUrl() {
     return;
   }
 
-  // Block obvious non-article pages (homepages)
+  // Block obvious non-article pages
   if (!parsed.pathname || parsed.pathname === "/" || parsed.pathname.length < 2) {
     statusMsg.textContent = "Please paste a direct article URL (not the homepage).";
     return;

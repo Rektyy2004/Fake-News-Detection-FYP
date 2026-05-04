@@ -48,7 +48,7 @@ def main():
         print(f"Found columns: {list(df.columns)}")
         sys.exit(1)
 
-    # Clean Data: Drop Missing or Empty News
+    # Clean Data
     df = df.dropna(subset=["news"])
     df["news"] = df["news"].astype(str).str.strip()
     df = df[df["news"] != ""]

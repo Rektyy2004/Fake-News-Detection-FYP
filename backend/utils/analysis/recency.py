@@ -1,11 +1,7 @@
 from __future__ import annotations
-
 import time
-
 from dateutil import parser as dateparser
-
 from . import ArticlePayload, CheckResult
-
 
 class recency_check:
     HIGH_SENSITIVITY_KEYWORDS = [

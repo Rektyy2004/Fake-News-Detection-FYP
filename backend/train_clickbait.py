@@ -40,7 +40,7 @@ def load_and_merge_datasets() -> pd.DataFrame:
         .str.strip()
     )
 
-    # Drop empty / null rows
+    # Drop empty/null rows
     df = df.dropna(subset=["headline", "label"])
     df = df[df["headline"] != ""]
     df["label"] = df["label"].astype(int)

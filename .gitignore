@@ -2,10 +2,18 @@
 .env
 backend/.env
 
-# Dependencies
+# Dependencies and Package Files
 node_modules/
 venv/
 backend/venv/
+package.json
+package-lock.json
+
+# Image folder
+image/
+
+# User requested exclusions
+backend/requirements.txt
 
 # Python cache
 __pycache__/
@@ -13,16 +21,10 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Datasets and Models (Recommended to ignore if large)
-backend/*.csv
-backend/*.pkl
-backend/*.xlsx
-backend/*.json
-
-# User requested (be careful: usually public)
-# requirements.txt
-# backend/requirements.txt
+# Datasets and Models (ALLOWED)
+# (Lines removed so they ARE uploaded)
 
 # Misc
 .DS_Store
 .vscode/
+

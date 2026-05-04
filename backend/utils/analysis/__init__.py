@@ -1,30 +1,13 @@
-"""
-Purpose:
-- Makes this folder a Python package.
-- Defines shared data structures (ArticlePayload, CheckResult) used by all credibility checks.
-- Provides analyze_credibility(): the main function that runs each check safely
-  and combines results into one JSON-ready response.
-
-How it works:
-- Takes article info (title, text, date, domain)
-- Runs each check module one by one
-- If one check crashes, the rest still continue
-- Computes an overall score for the frontend
-"""
-
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal, Optional
 
 import numpy as np
 from dotenv import load_dotenv
 
-# Load environment variables from .env
+# Load .env
 load_dotenv()
 
-
-# ============================================================================
 # Type Definitions
-# ============================================================================
 Status = Literal["pass", "fail", "unknown"]
 
 
@@ -66,7 +49,6 @@ ALL_CHECKS = [
     ("Headline Classification", headline_classifier_check),
 ]
 
-
 # Helpers
 def _safe_run_check(name: str, check_class, payload: ArticlePayload) -> CheckResult:
     """
@@ -107,10 +89,7 @@ def _status_to_score(status: str) -> float:
         return 0.5
     return 0.0
 
-
-# ============================================================================
 # Main Orchestration Function
-# ============================================================================
 def analyze_credibility(
     title: str,
     text: str,
